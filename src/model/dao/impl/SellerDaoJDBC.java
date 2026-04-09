@@ -10,7 +10,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SellerDaoJDBC implements SellerDao {
 
@@ -72,6 +75,56 @@ public class SellerDaoJDBC implements SellerDao {
     @Override
     public List<Seller> findAll() {
         return List.of();
+    }
+
+    @Override
+    public List<Seller> findByDepartment(Department dep) {
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try{
+
+            st = conn.prepareStatement(
+                    "SELECT seller.*, department.Name as DepName "
+                            + "FROM seller INNER JOIN department "
+                            + "ON seller.DepartmentId = department.Id "
+                            + "WHERE DepartmentId = ? "
+                            + "ORDER BY Name"
+            );
+
+            st.setInt(1, dep.getId());
+            rs = st.executeQuery();
+
+            List<Seller> sellersList = new ArrayList<>();
+            //Usando Map para controlar a não repetição do departamento
+            Map<Integer, Department> map = new HashMap<>();
+
+            while(rs.next()){
+                //criar um objeto departamento e vendedor temporario para inserir os dados da busca
+
+                //Testanto se departamento ja existe pegando o departamentoId e se não tiver ainda vai setar como nulo
+                Department depTemporary = map.get(rs.getInt("DepartmentId"));
+
+                //verifica se no map esta como null e se estiver, ou seja, sem um departamento setado, ai entrara e irá setar o departamento
+                if (depTemporary == null){
+                    depTemporary = instantiateDeparment(rs);
+                    map.put(rs.getInt("DepartmentId"), depTemporary);
+                }
+
+                Seller sellerTemporary = instantiateSeller(rs, depTemporary);
+                sellersList.add(sellerTemporary);
+            }
+            return sellersList;
+
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+
+        } finally {
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
+        }
+
+
+
     }
 
 
