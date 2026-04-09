@@ -50,19 +50,9 @@ public class SellerDaoJDBC implements SellerDao {
             rs = st.executeQuery();
 
             if(rs.next()){
-                //criar um objeto departamento temporario para inserir os dados da busca
-                Department depTemporary = new Department();
-                depTemporary.setId(rs.getInt("DepartmentId"));
-                depTemporary.setName(rs.getString("DepName"));
-
-                //criar um objeto vendedor temporario para inserir os dados da busca
-                Seller sellerTemporary = new Seller();
-                sellerTemporary.setId(id);
-                sellerTemporary.setName(rs.getString("Name"));
-                sellerTemporary.setEmail(rs.getString("Email"));
-                sellerTemporary.setBaseSalary(rs.getDouble("BaseSalary"));
-                sellerTemporary.setBirthDate(rs.getDate("BirthDate"));
-                sellerTemporary.setDepartment(depTemporary);
+                //criar um objeto departamento e vendedor temporario para inserir os dados da busca
+                Department depTemporary = instantiateDeparment(rs);
+                Seller sellerTemporary = instantiateSeller(rs, depTemporary);
 
                 return sellerTemporary;
             }
@@ -82,5 +72,25 @@ public class SellerDaoJDBC implements SellerDao {
     @Override
     public List<Seller> findAll() {
         return List.of();
+    }
+
+
+    //Metodos auxiliares de criação de objeto departamento e vendedor
+    private Department instantiateDeparment(ResultSet rs) throws SQLException {
+        Department depTemporary =  new Department();
+        depTemporary.setId(rs.getInt("DepartmentId"));
+        depTemporary.setName(rs.getString("DepName"));
+        return depTemporary;
+    }
+
+    private Seller instantiateSeller(ResultSet rs, Department depTemporary) throws SQLException {
+        Seller sellerTemporary = new Seller();
+        sellerTemporary.setId(rs.getInt("Id"));
+        sellerTemporary.setName(rs.getString("Name"));
+        sellerTemporary.setEmail(rs.getString("Email"));
+        sellerTemporary.setBaseSalary(rs.getDouble("BaseSalary"));
+        sellerTemporary.setBirthDate(rs.getDate("BirthDate"));
+        sellerTemporary.setDepartment(depTemporary);
+        return sellerTemporary;
     }
 }
