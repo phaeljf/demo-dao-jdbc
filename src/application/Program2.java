@@ -1,6 +1,7 @@
 package application;
 
 import model.dao.DaoFactory;
+import model.dao.DepartmentDao;
 import model.dao.SellerDao;
 import model.entities.Department;
 import model.entities.Seller;
@@ -14,37 +15,44 @@ public class Program2 {
     static void main(String[] args) {
 
         Scanner sc = new Scanner(System.in);
-
-        SellerDao sellerDao = DaoFactory.createSellerDao();
-
-        System.out.println();
-        System.out.println("=== TESTE 1: Seller findById ===");
-
+        DepartmentDao departmentDao = DaoFactory.createDepartmentDao();
 
         System.out.println();
-        System.out.println("=== TESTE 2: Seller findByDepartment ===");
-
-
+        System.out.println("=== TESTE 1: Department findById ===");
+        System.out.println("=== Enter Department Id ===");
+        int id = sc.nextInt();
+        Department departmentTemp = departmentDao.findById(id);
+        System.out.println(departmentTemp);
 
         System.out.println();
         System.out.println("=== TESTE 3: All Seller findAll ===");
+        List<Department> departments = departmentDao.findAll();
+        for (Department department : departments) {
+            System.out.println(department);
+        }
+
+        System.out.println();
+        System.out.println("=== TESTE 4: Department Insert ===");
+        System.out.println("=== Enter Department Name ===");
+        String name = sc.next();
+        departmentTemp = new Department(null, name);
+        departmentDao.insert(departmentTemp);
+
+        System.out.println();
+        System.out.println("=== TESTE 5: Department update ===");
+        System.out.println("=== Enter Department Id ===");
+        id = sc.nextInt();
+        System.out.println("=== Enter New Department Name ===");
+        name = sc.next();
+        departmentTemp = new Department(id,name);
+        departmentDao.update(departmentTemp);
 
 
         System.out.println();
-        System.out.println("=== TESTE 4: Seller Insert ===");
-
-
-        System.out.println();
-        System.out.println("=== TESTE 5: Seller update ===");
-
-
-
-        System.out.println();
-        System.out.println("=== TESTE 6: Seller delete ===");
-
-
-
-
+        System.out.println("=== TESTE 6: Department delete ===");
+        System.out.println("=== Enter Department Id ===");
+        id = sc.nextInt();
+        departmentDao.deleteById(id);
 
 
         sc.close();
